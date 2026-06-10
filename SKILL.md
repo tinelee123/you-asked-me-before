@@ -1,6 +1,6 @@
 ---
 name: you-asked-me-before
-description: Use before starting a new non-trivial task when the user may have asked a similar question before. Searches prior sessions with session_search or an equivalent history-search tool, evaluates whether old work is relevant, complete, and fresh, then either silently proceeds, reuses prior work, performs an incremental update, or asks the user whether to reuse, update, or redo. Useful for repeated research, comparisons, setup guides, troubleshooting, generated artifacts, and time-sensitive topics such as leaderboards, APIs, model choices, rankings, product docs, or software versions.
+description: Use before starting a new non-trivial task when the user may have asked a similar question before. Searches prior sessions with any available history-search capability, evaluates whether old work is relevant, complete, and fresh, then either silently proceeds, reuses prior work, performs an incremental update, or asks the user whether to reuse, update, or redo. Useful for repeated research, comparisons, setup guides, troubleshooting, generated artifacts, and time-sensitive topics such as leaderboards, APIs, model choices, rankings, product docs, or software versions. If no history-search capability exists in the current agent runtime, silently continue without blocking.
 ---
 
 # You Asked Me Before
@@ -28,13 +28,21 @@ Do not use for:
 
 A follow-up means the user's current message clearly continues the immediately previous work, for example "continue", "do that", "fix it", "same as above", equivalent phrases in the user's language, or a direct reference to the current conversation's last result.
 
-## Required Tool Behavior
+## Runtime Compatibility
 
-Prefer `session_search` when available.
+This skill is vendor-neutral. It only requires the `SKILL.md` format and does not depend on any Codex-specific, Claude-specific, or OpenAI-specific instruction.
 
-If `session_search` is unavailable, errors, times out, or returns no useful result within one call, silently continue with the user's task. Do not mention the failed or empty history check.
+Use whatever history-search capability the current agent runtime provides, such as:
 
-If a runtime exposes an equivalent history-search tool under another name, use that tool with the same rules.
+- `session_search`
+- conversation or thread search
+- memory search
+- local transcript search
+- workspace or project history search
+
+If the runtime has no history-search capability, or if the available tool errors, times out, or returns no useful result within one call, silently continue with the user's task. Do not mention the failed or empty history check.
+
+Ignore optional runtime-specific metadata files that do not apply to the current agent.
 
 ## Procedure
 
@@ -48,13 +56,15 @@ Create 2-3 compact query variants from the user's request:
 
 Keep queries short. Prefer terms that would have appeared in the user's earlier request or the assistant's answer.
 
-Examples:
+If the runtime provides `session_search`, use calls like:
 
 ```text
 session_search(query="arena.ai coding leaderboard", limit=3, sort="newest")
 session_search(query="arena coding model ranking", limit=3, sort="newest")
 session_search(query="coding model leaderboard comparison", limit=3, sort="newest")
 ```
+
+If the runtime exposes a different history-search interface, translate these into the closest equivalent calls.
 
 Use `sort="newest"` when recency matters.
 
@@ -153,7 +163,7 @@ Use these defaults when the user has not chosen A/B/C:
 
 ## Failure Modes
 
-- `session_search` unavailable: continue silently.
+- No history-search capability is available: continue silently.
 - Search returns weak matches: continue silently.
 - Snippet is too vague: fetch context once or ignore.
 - Prior information may be stale: verify or update before relying on it.

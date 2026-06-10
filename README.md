@@ -1,8 +1,10 @@
 # You Asked Me Before
 
-A Codex skill for checking whether a user has asked a similar question before, then reusing, updating, or redoing prior work without interrupting the user unnecessarily.
+An agent skill for checking whether a user has asked a similar question before, then reusing, updating, or redoing prior work without interrupting the user unnecessarily.
 
-This skill is designed for agents that have access to `session_search` or an equivalent history-search tool. If history search is unavailable, it silently falls back to normal task execution.
+This repository uses the portable `SKILL.md` format. It is designed for any agent runtime that can read skills or load Markdown instructions, including Codex, Claude Code, and other SKILL.md-compatible agents.
+
+If the current agent has a history-search capability, the skill uses it. If history search is unavailable, it silently falls back to normal task execution.
 
 ## What It Does
 
@@ -35,11 +37,22 @@ Do not use it for simple factual questions, direct code edits in the current act
     `-- openai.yaml
 ```
 
-`SKILL.md` contains the actual skill instructions. `agents/openai.yaml` contains UI metadata for OpenAI/Codex-compatible skill runtimes.
+`SKILL.md` contains the portable skill instructions. `agents/openai.yaml` contains optional UI metadata for OpenAI/Codex runtimes; other agents can ignore it safely.
+
+## Compatibility
+
+The core skill is runtime-neutral:
+
+- Codex/OpenAI skill runtimes can use `SKILL.md` and the optional `agents/openai.yaml` metadata.
+- Claude Code and Claude Skills can use the top-level `SKILL.md`.
+- Other SKILL.md-compatible agents can use the same instructions directly.
+- Agents without native skill support can still use the contents of `SKILL.md` as custom instructions.
+
+The only functional dependency is access to prior-session or conversation history. If an agent does not expose a history-search tool, this skill degrades gracefully and continues without blocking.
 
 ## Installation
 
-Install or import this repository as a Codex-compatible skill:
+Install or import this repository as a SKILL.md-compatible agent skill:
 
 ```text
 https://github.com/tinelee123/you-asked-me-before
@@ -59,7 +72,7 @@ Use $you-asked-me-before to check whether I asked this before, then reuse, updat
 
 ## Validation
 
-The skill has been validated with the Codex skill creator validator:
+The skill has been validated with the skill creator validator:
 
 ```text
 Skill is valid!
