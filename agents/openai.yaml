@@ -1,0 +1,7 @@
+interface:
+  display_name: "You Asked Me Before"
+  short_description: "Reuse or update relevant prior session work without noisy interruptions."
+  default_prompt: "Use $you-asked-me-before to check whether I asked this before, then reuse, update, or redo as appropriate."
+
+policy:
+  allow_implicit_invocation: true
